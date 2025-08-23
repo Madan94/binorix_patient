@@ -25,7 +25,7 @@ class _SignUpFormState extends State<SignUpForm> {
     void sendsignup(String name, String phone, String email, String password, String dob, String address, String gender, String otherDetails) async {
       try {
         final response = await http.post(
-          Uri.parse('http://localhost:5050/patient/auth/signin'),
+          Uri.parse('http://192.168.0.131:5050/patient/auth/signin'),
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({
             "name": name,

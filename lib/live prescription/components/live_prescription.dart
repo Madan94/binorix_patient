@@ -1,30 +1,17 @@
 import 'package:flutter/material.dart';
-import '../../../constants.dart';
-import 'components/profile_avatar.dart';
-import 'components/profile_info_card.dart';
-import 'components/profile_stats_card.dart';
-import 'components/profile_floating_buttons.dart';
-import 'edit_profile_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'prescription_list_item.dart';
+import 'prescription_stats_card.dart';
+import 'floating_action_buttons.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class LivePrescription extends StatefulWidget {
+  const LivePrescription({Key? key}) : super(key: key);
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<LivePrescription> createState() => _LivePrescriptionState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  final Map<String, dynamic> userData = {
-    "name": "Prieyan",
-    "PhoneNumber": "9360179308",
-    "email": "prieyan@gmail.com",
-    "password": "123456",
-    "dob": "23/05/2002",
-    "gender": "Male",
-    "address": "Xhoaafnsdfje",
-    "otherDetails": "Am allergic to peanuts",
-  };
-
+class _LivePrescriptionState extends State<LivePrescription> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +20,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: Colors.white,
         elevation: 0,
         title: const Text(
-          'Profile',
+          'Live Prescriptions',
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.w600,
@@ -55,7 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Column(
         children: [
-          // Header with title and action buttons
+          // Header with title and contact buttons
           Container(
             padding: const EdgeInsets.all(16),
             color: Colors.white,
@@ -71,14 +58,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 const Spacer(),
                 ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => EditProfileScreen(userData: userData),
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -86,38 +66,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Edit Profile'),
+                  child: const Text('Contact Us'),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
+                    backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Settings'),
+                  child: const Text('Connect Wallet'),
                 ),
               ],
             ),
           ),
           
-          // Profile Avatar Section
-          Container(
-            margin: const EdgeInsets.all(16),
-            child: const ProfileAvatar(),
-          ),
-          
-          // Profile Information
+          // Prescriptions list
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                ProfileInfoCard(userData: userData),
-                const SizedBox(height: 16),
-              ],
+            child: ListView.builder(
+              padding: const EdgeInsets.all(16),
+              itemCount: _prescriptions.length,
+              itemBuilder: (context, index) {
+                return PrescriptionListItem(
+                  prescription: _prescriptions[index],
+                );
+              },
             ),
           ),
           
@@ -127,28 +103,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: ProfileStatsCard(
-                    title: 'Total Prescriptions',
-                    value: '15',
-                    icon: Icons.medication,
+                  child: PrescriptionStatsCard(
+                    title: 'Currently Processing',
+                    value: '22',
+                    icon: Icons.waves,
                     color: Colors.blue,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ProfileStatsCard(
-                    title: 'Active Prescriptions',
-                    value: '3',
+                  child: PrescriptionStatsCard(
+                    title: 'Active Patients',
+                    value: '2',
                     icon: Icons.check_circle,
                     color: Colors.green,
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ProfileStatsCard(
-                    title: 'Completed',
-                    value: '12',
-                    icon: Icons.done_all,
+                  child: PrescriptionStatsCard(
+                    title: 'Total Medicines',
+                    value: '25',
+                    icon: Icons.medication,
                     color: Colors.purple,
                   ),
                 ),
@@ -157,7 +133,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ],
       ),
-      floatingActionButton: const ProfileFloatingButtons(),
+      floatingActionButton: const FloatingActionButtons(),
     );
   }
+
+  // Sample prescription data
+  final List<Map<String, dynamic>> _prescriptions = [
+    {
+      'id': 'ZRP8442',
+      'dateTime': '8/23/2025, 4:07:53 AM',
+      'patientName': 'prieyan',
+      'phone': '9360179308',
+      'email': 'prieyan@gmail.com',
+      'medicine': 'Paracetamol',
+      'quantity': 'Qty: 12',
+      'note': 'Take after food',
+      'dosage': 'Morning',
+      'additionalNotes': 'Take Care',
+      'status': 'Processing',
+      'lastUpdated': 'Updated: 4:07:53 AM',
+    },
+    {
+      'id': 'ZRP8443',
+      'dateTime': '8/23/2025, 4:08:15 AM',
+      'patientName': 'prieyan',
+      'phone': '9360179308',
+      'email': 'prieyan@gmail.com',
+      'medicine': 'Ibuprofen',
+      'quantity': 'Qty: 8',
+      'note': 'Take with food',
+      'dosage': 'Evening',
+      'additionalNotes': 'Take Care Ma',
+      'status': 'Processing',
+      'lastUpdated': 'Updated: 4:08:15 AM',
+    },
+    {
+      'id': 'ZRP8444',
+      'dateTime': '8/23/2025, 4:09:00 AM',
+      'patientName': 'prieyan',
+      'phone': '9360179308',
+      'email': 'prieyan@gmail.com',
+      'medicine': 'Vitamin C',
+      'quantity': 'Qty: 15',
+      'note': 'Take daily',
+      'dosage': 'Morning',
+      'additionalNotes': 'take care',
+      'status': 'Processing',
+      'lastUpdated': 'Updated: 4:09:00 AM',
+    },
+  ];
 }

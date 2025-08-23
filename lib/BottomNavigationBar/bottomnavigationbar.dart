@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 // import 'screens/search_screen.dart';
 // import 'screens/notifications_screen.dart';
 import '../../Profile/profile_screen.dart';
-
+import '../../live prescription/live_prescription_screen.dart';
+import '../../manage prescription/manage_prescription.dart';
 class MainScreen extends StatefulWidget {
   const MainScreen({Key? key}) : super(key: key);
 
@@ -15,6 +16,9 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _pages = [
+    ManagePrescription(),
+    LivePrescriptionScreen(),
+    
     ProfileScreen(),
     // SearchScreen(),
     // NotificationsScreen(),

@@ -31,7 +31,7 @@ class _LoginFormState extends State<LoginForm> {
   void sendLogin(String email, String password) async {
     try {
       final response = await http.post(
-        Uri.parse('http://localhost:5050/patient/auth/login'),
+        Uri.parse('http://192.168.0.131:5050/patient/auth/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({"email": email, "password": password}),
       );
