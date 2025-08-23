@@ -1,59 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-// import '../../../components/already_have_an_account_acheck.dart';
+import 'dart:convert';
 import '../../../constants.dart';
-// import '../../Signup/signup_screen.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:jwt_decoder/jwt_decoder.dart';
+import '../../Profile/profile_screen.dart';
+import '../../BottomNavigationBar/bottomnavigationbar.dart';
+class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
 
-class LoginForm extends StatelessWidget {
-  const LoginForm({
-    Key? key,
-  }) : super(key: key);
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
 
+class _LoginFormState extends State<LoginForm> {
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController passwordController = TextEditingController();
+  final storage = FlutterSecureStorage();
 
+  Future<void> saveToken(String token) async {
+    await storage.write(key: 'jwt_token', value: token);
+  }
+
+  Future<bool> isJwtValid() async {
+    final token = await storage.read(key: 'jwt_token');
+    if (token == null) return false;
+    return !JwtDecoder.isExpired(token);
+  }
+
+  void sendLogin(String email, String password) async {
+    try {
+      final response = await http.post(
+        Uri.parse('http://localhost:5050/patient/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({"email": email, "password": password}),
+      );
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+      if (responseData.containsKey('token')) {
+        await saveToken(responseData['token']);
+        if (await isJwtValid()) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(),
+            ),
+          );
+        } else {
+          print("❌ JWT is invalid or expired.");
+        }
+      } else {
+        print("❌ Login failed: ${responseData['message']}");
+      }
+    } catch (e) {
+      print(e);
+    }
+    emailController.clear();
+    passwordController.clear();
+  }
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController emailController= TextEditingController();
-    TextEditingController passwordController = TextEditingController();
-    void sendemail(String email) async {
-      print(email);
-      try {
-        final response = await http.post(
-          Uri.parse('http://localhost:5050/patient/auth/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: '{"email": "$email"}',
-        );
-        print(response.body);
-      } catch (e) {
-        print(e);
-      }
-      emailController.clear();
-      // final channel = IOWebSocketChannel.connect('ws://echo.websocket.org');
-      // channel.sink.add(message);
-      // channel.stream.listen((message) {
-      //   print(message);
-      // });
-    }
-    void sendpassword(String password){
-      print(password);
-      passwordController.clear();
-    }
-    void sendLogin(String email, String password) async {
-      print('Email: $email');
-      print('Password: $password');
-      try {
-        final response = await http.post(
-          Uri.parse('http://localhost:5050/patient/auth/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: '{"email": "$email", "password": "$password"}',
-        );
-        print(response.body);
-      } catch (e) {
-        print(e);
-      }
-      emailController.clear();
-      passwordController.clear();
-    }
     return Form(
       child: Column(
         children: [
@@ -62,7 +68,6 @@ class LoginForm extends StatelessWidget {
             keyboardType: TextInputType.emailAddress,
             textInputAction: TextInputAction.next,
             cursorColor: kPrimaryColor,
-            onSaved: (email) {},
             decoration: const InputDecoration(
               hintText: "Your email",
               prefixIcon: Padding(
@@ -90,27 +95,14 @@ class LoginForm extends StatelessWidget {
           const SizedBox(height: defaultPadding),
           ElevatedButton(
             onPressed: () {
-              if(emailController.text.isNotEmpty && passwordController.text.isNotEmpty){
+              if (emailController.text.isNotEmpty &&
+                  passwordController.text.isNotEmpty) {
                 sendLogin(emailController.text, passwordController.text);
               }
             },
-            child: Text(
-              "Login".toUpperCase(),
-            ),
+            child: Text("Login".toUpperCase()),
           ),
           const SizedBox(height: defaultPadding),
-          // AlreadyHaveAnAccountCheck(
-          //   press: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(
-          //         builder: (context) {
-          //           return const SignUpScreen();
-          //         },
-          //       ),
-          //     );
-          //   },
-          // ),
         ],
       ),
     );
